@@ -3,3 +3,7 @@ numpy
 pandas
 pydeck
 streamlit
+google-cloud-bigquery==1.28.0
+google-auth 
+google-auth-httplib2 
+google-api-python-client

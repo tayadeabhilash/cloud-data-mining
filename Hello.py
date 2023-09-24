@@ -13,7 +13,12 @@
 # limitations under the License.
 
 import streamlit as st
+import streamlit as st
+import pandas as pd
+import numpy as np
 from streamlit.logger import get_logger
+from google.oauth2 import service_account
+from google.cloud import bigquery
 
 LOGGER = get_logger(__name__)
 
@@ -24,27 +29,24 @@ def run():
         page_icon="👋",
     )
 
-    st.write("# Welcome to Streamlit! 👋")
 
-    st.sidebar.success("Select a demo above.")
-
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
+    # Create API client.
+    credentials = service_account.Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"]
     )
+    client = bigquery.Client(credentials=credentials)
+
+    query = """
+        SELECT *
+        FROM
+        `clouddatamining.crimecount`
+            """
+    dfquery = client.query(query)
+
+    df_crimecount=dfquery.to_dataframe()
+    # df_crimecount.head()
+
+    st.bar_chart(df_crimecount)
 
 
 if __name__ == "__main__":
