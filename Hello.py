@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import streamlit as st
-import streamlit as st
 import pandas as pd
 import numpy as np
 from streamlit.logger import get_logger
@@ -36,17 +35,17 @@ def run():
     )
     client = bigquery.Client(credentials=credentials)
 
-    query = """
-        SELECT *
-        FROM
-        `clouddatamining.crimecount`
-            """
+    query = """ SELECT * FROM `clouddatamining.categorycount` LIMIT 1000 """
     dfquery = client.query(query)
 
     df_crimecount=dfquery.to_dataframe()
     # df_crimecount.head()
 
-    st.bar_chart(df_crimecount)
+   # st.bar_chart(df_crimecount)
+
+    chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
+
+    st.bar_chart(chart_data)
 
 
 if __name__ == "__main__":
