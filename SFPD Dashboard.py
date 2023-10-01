@@ -1,22 +1,7 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 from urllib.error import URLError
 
 import altair as alt
-import numpy as np
-import pandas as pd
+import pydeck as pdk
 from google.oauth2 import service_account
 from google.cloud import bigquery
 import streamlit as st
@@ -25,7 +10,6 @@ credentials = service_account.Credentials.from_service_account_info(
     st.secrets["gcp_service_account"]
 )
 client = bigquery.Client(credentials=credentials)
-
 
 def data_frame_demo():
     @st.cache_data
@@ -96,7 +80,7 @@ def line_plot():
 
     df.sort_values(by='month', ignore_index=True)
     crime = st.selectbox(
-        "Choose category", list(df_table.index)
+        "Choose category", list(df_table.index), index=list(df_table.index).index('ASSAULT')
     )
 
     st.write("### Crimes per month - Category-Wise", df_table[df_table.index == crime])
@@ -112,9 +96,50 @@ def line_plot():
     )
     st.altair_chart(chart, use_container_width=True)
 
+
+def map_plot():
+    def get_table_data():
+        query = """ SELECT * FROM `clouddatamining.locationdata`"""
+        dfquery = client.query(query)
+        df = dfquery.to_dataframe()
+        return df
+
+    df_table = get_table_data()
+
+    list1 = list(df_table['category'].unique())
+    list1.remove('SEX OFFENSES, FORCIBLE')
+    crime = st.selectbox(
+        "Choose category", list1, index=list1.index('ROBBERY')
+    )
+
+    st.write("### Crimes Location by Category")
+    df_table = df_table[df_table.category == crime]
+    st.pydeck_chart(
+        pdk.Deck(
+            map_style=None,
+            initial_view_state={
+                "latitude": 37.76,
+                "longitude": -122.4,
+                "zoom": 11,
+                "pitch": 50,
+            },
+            layers=[pdk.Layer(
+                "HexagonLayer",
+                data=df_table,
+                get_position=["long", "lat"],
+                radius=200,
+                elevation_scale=4,
+                elevation_range=[0, 1000],
+                pickable=True,
+                extruded=True,
+            )],
+        )
+    )
+
 st.set_page_config(page_title="SFPD Dashboard", page_icon="📊")
 st.markdown("# SFPD Dashboard")
 st.sidebar.header("SFPD Dashboard")
 
 data_frame_demo()
 line_plot()
+map_plot()
