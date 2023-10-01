@@ -20,6 +20,7 @@ def data_frame_demo():
         df = dfquery.to_dataframe()
         return df.set_index("pddistrict")
 
+    @st.cache_data
     def get_chart_data():
         query = """ SELECT * FROM `clouddatamining.crimecount` WHERE year > 2006"""
         dfquery = client.query(query)
@@ -62,6 +63,7 @@ def data_frame_demo():
 
 
 def line_plot():
+    @st.cache_data
     def get_table_data():
         query = """ SELECT * FROM ( SELECT category, month, crime_count FROM `clouddatamining.category_count_by_month`) PIVOT (MAX(crime_count) FOR month IN 
         ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'))"""
@@ -69,6 +71,7 @@ def line_plot():
         df = dfquery.to_dataframe()
         return df.set_index('category')
 
+    @st.cache_data
     def get_chart_data():
         query = """ SELECT * FROM `clouddatamining.category_count_by_month`"""
         dfquery = client.query(query)
@@ -98,6 +101,7 @@ def line_plot():
 
 
 def map_plot():
+    @st.cache_data
     def get_table_data():
         query = """ SELECT * FROM `clouddatamining.locationdata`"""
         dfquery = client.query(query)
