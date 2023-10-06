@@ -142,7 +142,6 @@ def map_plot():
 
 st.set_page_config(page_title="SFPD Dashboard", page_icon="📊")
 st.markdown("# SFPD Dashboard")
-st.sidebar.header("SFPD Dashboard")
 
 data_frame_demo()
 line_plot()
